@@ -3,10 +3,15 @@ This project developes a multi-omics data based mathematical model for the predi
 This project uses Python 3.6 and the functions and explanations of each file are as follows:
 
 model.py: The predictive model. Running this file will give you the results of the model
+
 new_table.xlsx: The original data
+
 simplized_input.py: Read original data and split it into clinic.txt, label.txt, phosphosites.txt, phosphosites.txt and somatic.txt
+
 dataselect.py: Perform feature selection for four datasets and get the selected feature
+
 tools.py: Some helper functions used in this project
+
 figure.py: some functions used to plot figures in the paper
 
 
