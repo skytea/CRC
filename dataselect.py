@@ -147,7 +147,7 @@ def label_check(data, label):
     return max(count, len(data)-count)/len(data)
 
 
-def feature_select_normalization_anova(label, data, p):
+def feature_select_f_classif_anova(label, data, p):
     pda = np.array(extract_data(data, label))
     pda = pda.T
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
@@ -184,22 +184,22 @@ def two_samples_t(label, data, p):
         div = [[], []]
         for i in range(len(line)):
             div[target[name[i]]].append(line[i])
-        static, pv = stats.levene(div[0], div[1])
-        s, pVal = stats.ttest_ind(div[0], div[1], equal_var=(True if pv > 0.05 else False))
+        sta, pv = stats.levene(div[0], div[1])
+        s, pVal = stats.ttest_ind(div[0], div[1], equal_var=True if pv > 0.05 else False)
         if pVal <= p:
             selected_feature.append(data[u][0])
     return selected_feature
 
 
 def feature_(label, data, p):
-    name_a = feature_select_normalization_anova(label, data, p)
+    name_a = feature_select_f_classif_anova(label, data, p)
     name_t = two_samples_t(label, data, p)
     name_u = non_parameter_test(label, data, p)
     temp = []
     coin_name = []
     for line in name_u[1:]:
         temp.append(line[0])
-        if line[0] in name_a and line[0] in name_t:
+        if line[0] in name_t:
             coin_name.append(line[0])
     return coin_name
 
@@ -230,13 +230,15 @@ def clinic_feature_select(label, data, p):
             sp = SelectFpr(f_classif, alpha=0.001)
             new_X = sp.fit(tools.reverse([lined]), labeled)
             p_value_2 = sp.pvalues_[0]
-            static, pv = stats.levene(ob[0], ob[1])
-            s, p_value_3 = stats.ttest_ind(ob[0], ob[1], equal_var=(True if pv > 0.05 else False))
+            statistic, pv = stats.levene(ob[0], ob[1])
+            s, p_value_3 = stats.ttest_ind(ob[0], ob[1], equal_var=True if pv > 0.05 else False)
+            s, p_value_4 = stats.f_oneway(ob[0], ob[1])
             print(line[0])
             print(p_value)
             print(p_value_2)
             print(p_value_3)
-            if p_value < p and p_value_2 < p and p_value_3 < p:
+            print(p_value_4)
+            if p_value < p and p_value_3 < p:
                 selected_feature.append(line[0])
         if u == 3:
             observed = [[0, 0],
@@ -302,46 +304,32 @@ def clinic_feature_select(label, data, p):
                     k = 1200
                 else:
                     k = float(k)
-                ob[target[data[0][i]]].append(k)
+                #ob[target[data[0][i]]].append(k)
                 labeled.append(target[data[0][i]])
                 lined.append(k)
-            pda = []
-            for i in ob:
-                s = 0
-                n = 0
-                for j in i:
-                    if j is not np.nan:
-                        s += j
-                        n += 1
-                new_line = []
-                for j in i:
-                    if j is np.nan:
-                        new_line.append(s/n)
-                    else:
-                        new_line.append(j)
-                pda.append(new_line)
-            s = 0
-            n = 0
-            for i in range(len(lined)):
-                if lined[i] is not np.nan:
-                    s += lined[i]
-                    n += 1
-            for i in range(len(lined)):
-                if lined[i] is np.nan:
-                    lined[i] = s / n
-            ob = pda
+            imp = SimpleImputer(missing_values=np.nan, strategy='mean')
+            lined = imp.fit_transform(np.array([lined]).T).T[0]
+            count = 0
+            for i in range(1, len(line)):
+                if target[data[0][i]] == 2:
+                    continue
+                k = lined[count]
+                count += 1
+                ob[target[data[0][i]]].append(k)
             p_value = mann_whitney_u_test(ob[0], ob[1])
             sp = SelectFpr(f_classif, alpha=0.001)
             new_X = sp.fit(tools.reverse([lined]), labeled)
             p_value_2 = sp.pvalues_[0]
-            static, pv = stats.levene(ob[0], ob[1])
-            s, p_value_3 = stats.ttest_ind(ob[0], ob[1], equal_var=True)
-            if p_value < p and p_value_2 < p and p_value_3 < p:
+            statistic, pv = stats.levene(ob[0], ob[1])
+            s, p_value_3 = stats.ttest_ind(ob[0], ob[1], equal_var=True if pv > 0.05 else False)
+            s, p_value_4 = stats.f_oneway(ob[0], ob[1])
+            if p_value < p and p_value_3 < p:
                 selected_feature.append(line[0])
             print(line[0])
             print(p_value)
             print(p_value_2)
             print(p_value_3)
+            print(p_value_4)
         if u in [10, 11, 12]:
             observed = [[0, 0, 0],
                         [0, 0, 0]]
@@ -446,7 +434,9 @@ somatic = fisher_exact_test(label, tools.reverse(somatic), 0.01)
 print(somatic)
 
 protein = feature_(label, protein, 0.001)
+print(len(protein))
 print(protein)
 
 phosphosites = feature_(label, phosphosites, 0.001)
+print(len(phosphosites))
 print(phosphosites)

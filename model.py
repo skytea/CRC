@@ -70,9 +70,10 @@ def single_test(train_x, train_y, test_x, test_y, model):
 
     model = tools.train(train_x, train_y, model)
     return model.predict(test_x), test_y
-    accuracy = tools.test(test_x, test_y, model)
+    #accuracy = tools.test(test_x, test_y, model)
+    #return accuracy
 
-    '''
+
     qaq = -1
     plt.tick_params(labelsize=15)
     for clf, c_name in zip([svm, lr, nb, stacking_clf],
@@ -94,9 +95,8 @@ def single_test(train_x, train_y, test_x, test_y, model):
     plt.title("receiver operating characteristic curve", fontsize=15)
     plt.legend(loc='lower right', fontsize=10)
     plt.show()
-    '''
 
-    return accuracy
+    return model.predict(test_x), test_y
 
 
 def multiple_test(times, model, label_x, y):
@@ -110,6 +110,7 @@ def multiple_test(times, model, label_x, y):
         train_y = y[train_index]
         test_x = label_x[test_index]
         test_y = y[test_index]
+        #accuracy.append(single_test(train_x, train_y, test_x, test_y, model))
         pre_y, y_true = single_test(train_x, train_y, test_x, test_y, model)
         TP = 0
         TN = 0
@@ -130,7 +131,6 @@ def multiple_test(times, model, label_x, y):
         precision.append((TP) / (TP + FP))
         sensitivity.append((TP) / (TP+FN))
         specificity.append((TN) / (FP + TN))
-        #accuracy.append(single_test(train_x, train_y, test_x, test_y, model, unlabel_x))
     print(accuracy)
     print(round(np.mean(accuracy), 4), end='')
     print('±', end='')
@@ -147,6 +147,9 @@ def multiple_test(times, model, label_x, y):
     print(round(np.mean(specificity), 4), end='')
     print('±', end='')
     print(round(np.std(specificity), 4))
+    means = [round(np.mean(accuracy), 4), round(np.mean(precision), 4), round(np.mean(sensitivity), 4), round(np.mean(specificity), 4)]
+    stds = [round(np.std(accuracy), 4), round(np.std(precision), 4), round(np.std(sensitivity), 4), round(np.std(specificity), 4)]
+    return means, stds
 
 
 def data_exam(data, y):
@@ -186,7 +189,7 @@ def discriminant(data, y):
     print(f_f)
 
 
-def F_pic(x, y):
+def F_pic(x, y, name):
     pca_model = PCA(n_components=2)
     x = pca_model.fit_transform(x)
     colors = ['r', 'b']
@@ -196,6 +199,10 @@ def F_pic(x, y):
     plt.xticks([])
     plt.yticks([])
     plt.scatter(x[:,0], x[:,1], c=color)
+    #plt.xlabel("First Principal Component", fontsize=20)
+    #plt.ylabel("Second Principal Component", fontsize=20)
+    #plt.tick_params(labelsize=15)
+    plt.savefig(name + '.png')
     plt.show()
 
 
@@ -213,8 +220,8 @@ for i in label_:
     else:
         label.append(i)
 
-useful_data = ['A0A024R4G1_509_Y', 'A0A024R4Z6_441_Y', 'A0A024RAM4_1817_S', 'A0A087WVT6_320_S', 'A0A140VJN8_130_S', 'B4DPP8_314_T', 'B4DPP8_320_S', 'B4DPP8_325_T', 'P08670_436_T', 'P62263_137_S', 'Q6WKZ4_206_S', 'Q6WKZ4_338_S', 'Q8IZ21_358_T', 'Q92625_628_S', 'A0A024R046', 'A0A024R056', 'A0A024R0Y5', 'A0A024R1S8', 'A0A024R2U7', 'A0A024R3B5', 'A0A024R5K1', 'A0A024R7I3', 'A0A024R9G4', 'A0A024RCX8', 'A0A024RCY1', 'A0A087WTA8', 'A0A0A0MRF6', 'A0A0A0MSM0', 'A0A0S2Z3J9', 'A0A140VJC9', 'A2RUA4', 'A4D1X5', 'A6NHQ2', 'A8K2L4', 'A8K878', 'B2R4P9', 'B2R5J1', 'B2RDF2', 'B2RDW1', 'B2ZDQ1', 'B4DEH0', 'B7ZB78', 'C9K0I4', 'D3DT27', 'E9PMC9', 'G1EPM2', 'O14917', 'O60493', 'O75554', 'P02452', 'P02461', 'P02749', 'P05164', 'P11908', 'P14780', 'P17066', 'P17600', 'P18077', 'P20585', 'P23378', 'P24158', 'P29350', 'P31947', 'P35637', 'P36268', 'P37802', 'P40763', 'P42224', 'P48061', 'P49327', 'P51572', 'P52209', 'P52630', 'P52732', 'P54707', 'P63261', 'P68371', 'P78346', 'Q13151', 'Q13287', 'Q13884', 'Q15029', 'Q2TAM5', 'Q53SW3', 'Q546E0', 'Q6DN03', 'Q6FIA3', 'Q7Z434', 'Q8N8A2', 'Q8WUM0', 'Q8WXH0', 'Q92734', 'Q96A33', 'Q96BP3', 'Q96IS6', 'Q99497', 'Q9BTE1', 'Q9BTT0', 'Q9NZ08', 'Q9UI15', 'Q9UNS2', 'Q9Y2Z0', 'Q9Y426']
-
+useful_data = ['A0A024R9K2_184_S', 'B4DPP8_325_T', 'B4DPP8_314_T', 'Q6WKZ4_206_S', 'P62263_137_S', 'A0A024R4G1_509_Y', 'A0A024RAM4_1817_S', 'P08670_436_T', 'A0A024R4Z6_441_Y', 'A0A140VJN8_130_S', 'Q6WKZ4_338_S', 'Q8IZ21_358_T', 'Q92625_628_S', 'A0A087WVT6_320_S', 'B4DPP8_320_S', 'P36268', 'A0A024R9G4', 'Q9BTE1', 'Q8WXH0', 'Q99497', 'P68371', 'P05164', 'A4D1X5', 'P35637', 'P42224', 'Q53SW3', 'A0A024RCX8', 'P02749', 'Q8N8A2', 'Q96IS6', 'P11908', 'A0A024R056', 'Q92734', 'Q9UNS2', 'P52630', 'B2R5J1', 'Q8WUM0', 'Q13287', 'A0A087WTA8', 'P29350', 'P31947', 'Q9Y426', 'P51572', 'A8K878', 'A2RUA4', 'P23378', 'A8K2L4', 'Q15029', 'Q6FIA3', 'Q2TAM5', 'Q96BP3', 'P18077', 'Q9Y2Z0', 'Q6DN03', 'B2ZDQ1', 'Q9UI15', 'P17600', 'A0A0S2Z3J9', 'C9K0I4', 'E9PMC9', 'P02461', 'P37802', 'P17066', 'A0A140VJC9', 'P48061', 'Q9NZ08', 'P63261', 'P49327', 'A6NHQ2', 'B2R4P9', 'D3DT27', 'B4DEH0', 'O75554', 'A0A024R2U7', 'P52732', 'P20585', 'G1EPM2', 'B2RDF2', 'A0A0A0MRF6', 'Q13884', 'P02452', 'O14917', 'Q96A33', 'O60493', 'P52209', 'B7ZB78', 'P40763', 'A0A024R7I3', 'A0A0A0MSM0', 'A0A024R0Y5', 'A0A024RCY1', 'Q9BTT0', 'P24158', 'A0A024R5K1', 'B2RDW1', 'A0A024R1S8', 'A0A024R3B5', 'P54707', 'Q13151', 'P14780', 'Q7Z434', 'P78346', 'Q546E0', 'A0A024R046']
+print(len(useful_data))
 clinic = tools.clinicRefine(clinic, label_)
 clinic = np.array(clinic, dtype=int)
 somatic = np.array(tools.somaticRefine(somatic, label_), dtype=int)
@@ -267,15 +274,30 @@ augmented_data, data_y = smote(x, 1, 5, y)
 #tools.generate_data_augmentation(augmented_data, data_y)
 
 discriminant(x, y)
-#F_pic(x, y)
+#F_pic(x, y, "previous_F")
 discriminant(augmented_data, data_y)
-#F_pic(augmented_data, data_y)
+#F_pic(augmented_data, data_y, "augmented_F")
 
 label_x = np.vstack((augmented_data, x))
 y = np.hstack((y, data_y))
 
 times_r = 20
-multiple_test(times_r, model, label_x, y)
-multiple_test(times_r, lr, label_x, y)
-multiple_test(times_r, svm, label_x, y)
-multiple_test(times_r, nb, label_x, y)
+names = ['Ensemble', 'LR', 'SVM', 'NB']
+models = [model, lr, svm, nb]
+for clr in range(4):
+    means, stds = multiple_test(times_r, models[clr], label_x, y)
+    '''
+    file = open(names[clr] + ".txt", 'w')
+    for mean in means:
+        file.write(str(mean) + ' ')
+    file.write('\n')
+    for std in stds:
+        file.write(str(std) + ' ')
+    file.write('\n')
+    for k in range(len(means)):
+        file.write(str(means[k]))
+        file.write('±')
+        file.write(str(stds[k]))
+        file.write('\n')
+    file.close()
+    '''

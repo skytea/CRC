@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 import math
 import tools
-import dataselect
+#import dataselect
 from sklearn import preprocessing
 import numpy as np
 
 
 def model_comparison():
     name = ['SVM', 'Ensemble', 'LR', 'Ensemble', 'NB', 'Ensemble']
-    mean = [0.96, 0.9776, 0.9581, 0.9776, 0.947, 0.9776]
-    std = [0.0172, 0.0168, 0.0191, 0.0168, 0.0252, 0.0168]
+    mean = [0.9599, 0.9802, 0.9643, 0.9802, 0.9488, 0.9802]
+    std = [0.0222, 0.0155, 0.0216, 0.0155, 0.0261, 0.0155]
     color = [(255/255, 225/255, 150/255), (255/255, 225/255, 150/255), (100/255, 180/255, 246/255), (100/255, 180/255, 246/255), (76/255, 175/255, 79/255), (76/255, 175/255, 79/255)]
 
     x = list(1.5*i+0.75 for i in range(len(mean)))
@@ -88,23 +88,16 @@ def plot_pca():
 
 def APSS():
     name = ['Accuracy', 'Precision', 'Sensitivity', 'Specificity']
-    mean = [[0.9326, 0.901, 0.9028, 0.8648],
-            [0.9273, 0.8884, 0.9153, 0.7774],
-            [0.8967, 0.8539, 0.8255, 0.9253],
-            [0.9561, 0.9318, 0.9526, 0.8266]]
-    std = [[0.0301, 0.0391, 0.0337, 0.045],
-           [0.0487, 0.0678, 0.0596, 0.0827],
-           [0.0702, 0.0754, 0.08, 0.0522],
-           [0.0277, 0.0398, 0.0302, 0.078]]
-    mean = np.array(mean)
-    mean = np.vstack((np.vstack((mean[:,2], mean[:,1])),np.vstack((mean[:,3], mean[:,0]))))
-
-    std = np.array(std)
-    std = np.vstack((np.vstack((std[:, 2], std[:, 1])), np.vstack((std[:, 3], std[:, 0]))))
-    mean = list(mean)
-    std = list(std)
-    print(mean)
     label = ['SVM', 'LR', 'NB', 'Ensemble']
+    mean = []
+    std = []
+    for i in label:
+        file = open(i + '.txt', 'r')
+        content = file.readlines()
+        mean.append([float(i) for i in content[0].split(' ')[:4]])
+        std.append([float(i) for i in content[1].split(' ')[:4]])
+    print(std)
+
     color = [(255/255, 225/255, 150/255), (100/255, 180/255, 246/255), (76/255, 175/255, 79/255), (229/255, 115/255, 115/255)]
 
     x = list(range(len(mean[0])))
@@ -112,9 +105,8 @@ def APSS():
     width = total_width / n
     plt.rcParams['font.sans-serif'] = ['SimHei']
     plt.rcParams['axes.unicode_minus'] = False
-    plt.ylim(0.7, 1.15)
+    plt.ylim(0.6, 1.15)
     plt.xlim(-0.3, 4)
-    plt.ylabel("Area under curve", fontsize=20)
     plt.tick_params(labelsize=15)
     for i in range(0, len(mean)):
         if i == 1:
@@ -129,4 +121,4 @@ def APSS():
     plt.show()
 
 
-APSS()
+model_comparison()

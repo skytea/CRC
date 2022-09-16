@@ -8,6 +8,7 @@ from sklearn.feature_selection import f_classif, chi2
 from sklearn import preprocessing
 import numpy as np
 import math
+from sklearn.impute import SimpleImputer
 
 
 def ExtractData(label, data):
